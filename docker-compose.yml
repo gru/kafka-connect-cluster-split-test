@@ -1,0 +1,115 @@
+version: "3.8"
+
+networks:
+  dc1:
+  dc2:
+
+services:
+  # =========================================================
+  # Router (единственная точка связи между DC)
+  # =========================================================
+  router:
+    image: alpine
+    container_name: dc-router
+    cap_add:
+      - NET_ADMIN
+    command: sh -c "apk add --no-cache iproute2 iptables && sleep infinity"
+    networks:
+      - dc1
+      - dc2
+
+  # =========================================================
+  # ZooKeeper (3 ноды: 2 в DC1, 1 в DC2)
+  # =========================================================
+  zk1:
+    image: confluentinc/cp-zookeeper:6.2.0
+    hostname: zk1
+    networks: [dc1]
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVERS: zk1:2888:3888;zk2:2888:3888;zk3:2888:3888
+
+  zk2:
+    image: confluentinc/cp-zookeeper:6.2.0
+    hostname: zk2
+    networks: [dc1]
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVERS: zk1:2888:3888;zk2:2888:3888;zk3:2888:3888
+
+  zk3:
+    image: confluentinc/cp-zookeeper:6.2.0
+    hostname: zk3
+    networks: [dc2]
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVERS: zk1:2888:3888;zk2:2888:3888;zk3:2888:3888
+
+  # =========================================================
+  # Kafka DC1 (2 брокера)
+  # =========================================================
+  kafka1:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka1
+    networks: [dc1]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: dc1
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  kafka2:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka2
+    networks: [dc1]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_BROKER_RACK: dc1
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  # =========================================================
+  # Kafka DC2 (2 брокера)
+  # =========================================================
+  kafka3:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka3
+    networks: [dc2]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_BROKER_RACK: dc2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  kafka4:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka4
+    networks: [dc2]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 4
+      KAFKA_BROKER_RACK: dc2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka4:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
