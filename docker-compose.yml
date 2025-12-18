@@ -3,6 +3,7 @@ version: "3.8"
 networks:
   dc1:
   dc2:
+  zk:
 
 services:
   # =========================================================
@@ -19,12 +20,13 @@ services:
       - dc2
 
   # =========================================================
-  # ZooKeeper (3 ноды: 2 в DC1, 1 в DC2)
+  # ZooKeeper (3 ноды, ВСЕ в одной сети zk)
   # =========================================================
   zk1:
     image: confluentinc/cp-zookeeper:6.2.0
+    platform: linux/amd64
     hostname: zk1
-    networks: [dc1]
+    networks: [zk]
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -32,8 +34,9 @@ services:
 
   zk2:
     image: confluentinc/cp-zookeeper:6.2.0
+    platform: linux/amd64
     hostname: zk2
-    networks: [dc1]
+    networks: [zk]
     environment:
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -41,20 +44,22 @@ services:
 
   zk3:
     image: confluentinc/cp-zookeeper:6.2.0
+    platform: linux/amd64
     hostname: zk3
-    networks: [dc2]
+    networks: [zk]
     environment:
       ZOOKEEPER_SERVER_ID: 3
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVERS: zk1:2888:3888;zk2:2888:3888;zk3:2888:3888
 
   # =========================================================
-  # Kafka DC1 (2 брокера)
+  # Kafka DC1 (4 брокера: dc1 + zk)
   # =========================================================
   kafka1:
     image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
     hostname: kafka1
-    networks: [dc1]
+    networks: [dc1, zk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 1
@@ -68,8 +73,9 @@ services:
 
   kafka2:
     image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
     hostname: kafka2
-    networks: [dc1]
+    networks: [dc1, zk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 2
@@ -81,17 +87,15 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
 
-  # =========================================================
-  # Kafka DC2 (2 брокера)
-  # =========================================================
   kafka3:
     image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
     hostname: kafka3
-    networks: [dc2]
+    networks: [dc1, zk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 3
-      KAFKA_BROKER_RACK: dc2
+      KAFKA_BROKER_RACK: dc1
       KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092
@@ -101,15 +105,225 @@ services:
 
   kafka4:
     image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
     hostname: kafka4
-    networks: [dc2]
+    networks: [dc1, zk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 4
-      KAFKA_BROKER_RACK: dc2
+      KAFKA_BROKER_RACK: dc1
       KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka4:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  # =========================================================
+  # Kafka DC2 (4 брокера: dc2 + zk)
+  # =========================================================
+  kafka5:
+    image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
+    hostname: kafka5
+    networks: [dc2, zk]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 5
+      KAFKA_BROKER_RACK: dc2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka5:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  kafka6:
+    image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
+    hostname: kafka6
+    networks: [dc2, zk]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 6
+      KAFKA_BROKER_RACK: dc2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka6:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  kafka7:
+    image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
+    hostname: kafka7
+    networks: [dc2, zk]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 7
+      KAFKA_BROKER_RACK: dc2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka7:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  kafka8:
+    image: confluentinc/cp-kafka:6.2.0
+    platform: linux/amd64
+    hostname: kafka8
+    networks: [dc2, zk]
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      KAFKA_BROKER_ID: 8
+      KAFKA_BROKER_RACK: dc2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:2181,zk2:2181,zk3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka8:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+
+  # =========================================================
+  # Postgres
+  # =========================================================
+  postgres:
+    image: postgres:14
+    platform: linux/amd64
+    container_name: postgres
+    hostname: postgres
+    networks: [dc1, dc2]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    command: >
+      postgres
+      -c wal_level=logical
+      -c max_replication_slots=10
+      -c max_wal_senders=10
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  # =========================================================
+  # Kafka Connect + Debezium (profile: connect)
+  # =========================================================
+  connect1:
+    image: debezium/connect:1.9
+    platform: linux/amd64
+    hostname: connect1
+    profiles: ["connect"]
+    networks:
+      - dc1
+      - zk
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - kafka4
+    environment:
+      BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
+      GROUP_ID: connect-cluster
+
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-status
+
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+      REST_PORT: 8083
+    ports:
+      - "8083:8083"
+
+  connect2:
+    image: debezium/connect:1.9
+    platform: linux/amd64
+    hostname: connect2
+    profiles: ["connect"]
+    networks:
+      - dc1
+      - zk
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - kafka4
+    environment:
+      BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
+      GROUP_ID: connect-cluster
+
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-status
+
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+      REST_PORT: 8083
+
+  connect3:
+    image: debezium/connect:1.9
+    platform: linux/amd64
+    hostname: connect3
+    profiles: ["connect"]
+    networks:
+      - dc2
+      - zk
+    depends_on:
+      - kafka5
+      - kafka6
+      - kafka7
+      - kafka8
+    environment:
+      BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
+      GROUP_ID: connect-cluster
+
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-status
+
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+      REST_PORT: 8083
+    ports:
+      - "8084:8083"
+
+  connect4:
+    image: debezium/connect:1.9
+    platform: linux/amd64
+    hostname: connect4
+    profiles: ["connect"]
+    networks:
+      - dc2
+      - zk
+    depends_on:
+      - kafka5
+      - kafka6
+      - kafka7
+      - kafka8
+    environment:
+      BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
+      GROUP_ID: connect-cluster
+
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-status
+
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+      REST_PORT: 8083
