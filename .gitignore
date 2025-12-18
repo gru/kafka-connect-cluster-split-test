@@ -1,1 +1,2 @@
 /connectors/pg-src-tbl*.json
+/connectors/jdbc-sink-tbl*.json

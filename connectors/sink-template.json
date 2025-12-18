@@ -1,0 +1,28 @@
+{
+  "name": "jdbc-sink-{{TABLE}}",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+
+    "topics": "src.public.{{TABLE}}",
+
+    "connection.url": "jdbc:postgresql://postgres:5432/dst",
+    "connection.user": "postgres",
+    "connection.password": "postgres",
+
+    "auto.create": "true",
+    "auto.evolve": "false",
+
+    "insert.mode": "upsert",
+    "pk.mode": "record_value",
+    "pk.fields": "id",
+
+    "table.name.format": "{{TABLE}}",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+
+    "tasks.max": "1"
+  }
+}

@@ -1,24 +1,34 @@
 #!/usr/bin/env bash
 set -e
 
-TEMPLATE="./connectors/template.json"
+SRC_TEMPLATE="./connectors/source-template.json"
+SINK_TEMPLATE="./connectors/sink-template.json"
 OUT_DIR="./connectors"
 
-if [[ ! -f "$TEMPLATE" ]]; then
-  echo "Template not found: $TEMPLATE"
+if [[ ! -f "$SRC_TEMPLATE" ]]; then
+  echo "Source template not found: $SRC_TEMPLATE"
   exit 1
 fi
 
-echo "Generating Debezium connectors..."
+if [[ ! -f "$SINK_TEMPLATE" ]]; then
+  echo "Sink template not found: $SINK_TEMPLATE"
+  exit 1
+fi
+
+echo "Generating Kafka Connect connectors..."
 
 for i in $(seq 1 10); do
   TABLE="tbl${i}"
-  OUT_FILE="${OUT_DIR}/pg-src-${TABLE}.json"
 
-  sed "s/{{TABLE}}/${TABLE}/g" "$TEMPLATE" > "$OUT_FILE"
+  SRC_OUT="${OUT_DIR}/pg-src-${TABLE}.json"
+  SINK_OUT="${OUT_DIR}/jdbc-sink-${TABLE}.json"
 
-  echo "  created $OUT_FILE"
+  sed "s/{{TABLE}}/${TABLE}/g" "$SRC_TEMPLATE" > "$SRC_OUT"
+  sed "s/{{TABLE}}/${TABLE}/g" "$SINK_TEMPLATE" > "$SINK_OUT"
+
+  echo "  created:"
+  echo "    - $SRC_OUT"
+  echo "    - $SINK_OUT"
 done
 
 echo "Done."
-
