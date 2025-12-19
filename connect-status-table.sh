@@ -3,11 +3,14 @@ set -e
 
 CONNECT_URL="http://localhost:8083"
 
-printf "\n%-35s | %-18s | %-30s\n" "CONNECTOR NAME" "CONNECTOR STATE" "TASK STATES"
-printf "%-35s-+-%-18s-+-%-30s\n" \
-  "-----------------------------------" \
-  "------------------" \
-  "------------------------------"
+printf "\n%-30s | %-15s | %-20s | %-35s\n" \
+  "CONNECTOR NAME" "STATE" "CONNECTOR NODE" "TASKS (STATE@NODE)"
+
+printf "%-30s-+-%-15s-+-%-20s-+-%-35s\n" \
+  "------------------------------" \
+  "---------------" \
+  "--------------------" \
+  "-----------------------------------"
 
 CONNECTORS=$(curl -s "$CONNECT_URL/connectors" | jq -r '.[]')
 
@@ -15,18 +18,23 @@ for NAME in $CONNECTORS; do
   STATUS_JSON=$(curl -s "$CONNECT_URL/connectors/$NAME/status")
 
   CONNECTOR_STATE=$(echo "$STATUS_JSON" | jq -r '.connector.state')
+  CONNECTOR_NODE=$(echo "$STATUS_JSON" | jq -r '.connector.worker_id')
 
-  TASK_STATES=$(echo "$STATUS_JSON" | jq -r '
-    .tasks
-    | map("task" + (.id|tostring) + ":" + .state)
-    | join(", ")
+  TASK_INFO=$(echo "$STATUS_JSON" | jq -r '
+    if (.tasks | length) == 0 then
+      "none"
+    else
+      .tasks
+      | map("task" + (.id|tostring) + ":" + .state + "@" + .worker_id)
+      | join(", ")
+    end
   ')
 
-  printf "%-35s | %-18s | %-30s\n" \
+  printf "%-30s | %-15s | %-20s | %-35s\n" \
     "$NAME" \
     "$CONNECTOR_STATE" \
-    "${TASK_STATES:-none}"
+    "$CONNECTOR_NODE" \
+    "$TASK_INFO"
 done
 
 echo
-
