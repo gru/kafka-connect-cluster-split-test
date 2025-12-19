@@ -25,14 +25,63 @@ CREATE TABLE tbl10 (id INT PRIMARY KEY, name VARCHAR(255));
 -- =========================
 \connect dst
 
-CREATE TABLE tbl1  (id INT, name VARCHAR(255));
-CREATE TABLE tbl2  (id INT, name VARCHAR(255));
-CREATE TABLE tbl3  (id INT, name VARCHAR(255));
-CREATE TABLE tbl4  (id INT, name VARCHAR(255));
-CREATE TABLE tbl5  (id INT, name VARCHAR(255));
-CREATE TABLE tbl6  (id INT, name VARCHAR(255));
-CREATE TABLE tbl7  (id INT, name VARCHAR(255));
-CREATE TABLE tbl8  (id INT, name VARCHAR(255));
-CREATE TABLE tbl9  (id INT, name VARCHAR(255));
-CREATE TABLE tbl10 (id INT, name VARCHAR(255));
+CREATE TABLE tbl1 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl1_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl2 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl2_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl3 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl3_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl4 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl4_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl5 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl5_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl6 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl6_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl7 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl7_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl8 (
+  id   INT NOT NULL,
+  name VARCHAR(255),
+  CONSTRAINT tbl8_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl9 (
+   id   INT NOT NULL,
+   name VARCHAR(255),
+   CONSTRAINT tbl9_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE tbl10 (
+   id   INT NOT NULL,
+   name VARCHAR(255),
+   CONSTRAINT tbl10_pkey PRIMARY KEY (id)
+);
 
