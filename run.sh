@@ -27,6 +27,12 @@ docker exec kafka1 kafka-topics \
   --config min.insync.replicas=2 \
   --config cleanup.policy=compact
 
+docker buildx build \
+  --platform linux/amd64 \
+  -t kafka-connect-debezium-jdbc:1.9 \
+  --load \
+  ./connect
+
 docker compose --profile connect up -d
 
 ./wait-connect-ready.sh

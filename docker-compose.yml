@@ -219,7 +219,7 @@ services:
   # Kafka Connect + Debezium (profile: connect)
   # =========================================================
   connect1:
-    image: debezium/connect:1.9
+    image: kafka-connect-debezium-jdbc:1.9
     container_name: connect1
     platform: linux/amd64
     hostname: connect1
@@ -250,7 +250,7 @@ services:
       - "8083:8083"
 
   connect2:
-    image: debezium/connect:1.9
+    image: kafka-connect-debezium-jdbc:1.9
     container_name: connect2
     platform: linux/amd64
     hostname: connect2
@@ -279,7 +279,7 @@ services:
       REST_PORT: 8083
 
   connect3:
-    image: debezium/connect:1.9
+    image: kafka-connect-debezium-jdbc:1.9
     container_name: connect3
     platform: linux/amd64
     hostname: connect3
@@ -310,7 +310,7 @@ services:
       - "8084:8083"
 
   connect4:
-    image: debezium/connect:1.9
+    image: kafka-connect-debezium-jdbc:1.9
     container_name: connect4
     platform: linux/amd64
     hostname: connect4
