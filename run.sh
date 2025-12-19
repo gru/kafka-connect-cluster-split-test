@@ -28,3 +28,9 @@ docker exec kafka1 kafka-topics \
   --config cleanup.policy=compact
 
 docker compose --profile connect up -d
+
+./wait-connect-ready.sh
+
+./generate-connectors.sh
+
+./deploy-connectors.sh
