@@ -5,6 +5,8 @@ POSTGRES_SERVICE="postgres"
 DB="src"
 USER="postgres"
 
+ROWS_PER_RUN=100
+
 echo "=================================================="
 echo "Filling src tables with test data"
 echo "=================================================="
@@ -18,12 +20,10 @@ for i in $(seq 1 10); do
     -U "$USER" \
     -d "$DB" \
     <<EOF
-INSERT INTO ${TABLE} (id, name)
+INSERT INTO ${TABLE} (name)
 SELECT
-  gs AS id,
-  '${TABLE}_name_' || gs AS name
-FROM generate_series(1, 100) gs
-ON CONFLICT (id) DO NOTHING;
+  '${TABLE}_name_' || gs
+FROM generate_series(1, ${ROWS_PER_RUN}) gs;
 EOF
 
 done
