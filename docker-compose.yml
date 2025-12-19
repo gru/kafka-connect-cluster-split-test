@@ -69,7 +69,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
-
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+        
   kafka2:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka2
@@ -86,7 +87,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
-
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+        
   kafka3:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka3
@@ -103,7 +105,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
-
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+        
   kafka4:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka4
@@ -120,6 +123,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
 
   # =========================================================
   # Kafka DC2 (4 брокера: dc2 + zk)
@@ -140,6 +144,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
 
   kafka6:
     image: confluentinc/cp-kafka:6.2.0
@@ -157,6 +162,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
 
   kafka7:
     image: confluentinc/cp-kafka:6.2.0
@@ -174,6 +180,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
 
   kafka8:
     image: confluentinc/cp-kafka:6.2.0
@@ -191,6 +198,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
 
   # =========================================================
   # Postgres
@@ -248,6 +256,12 @@ services:
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect1
       CONNECT_REST_ADVERTISED_PORT: 8083
+      
+      KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
+      KAFKA_JVM_PERFORMANCE_OPTS: >
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=100
+    mem_limit: 2g
     ports:
       - "8083:8083"
   
@@ -281,6 +295,12 @@ services:
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect2
       CONNECT_REST_ADVERTISED_PORT: 8083
+      
+      KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
+      KAFKA_JVM_PERFORMANCE_OPTS: >
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=100
+    mem_limit: 2g
   
   connect3:
     image: kafka-connect-debezium-jdbc:1.9
@@ -312,6 +332,11 @@ services:
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect3
       CONNECT_REST_ADVERTISED_PORT: 8083
+      KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
+      KAFKA_JVM_PERFORMANCE_OPTS: >
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=100
+    mem_limit: 2g      
     ports:
       - "8084:8083"
   
@@ -345,3 +370,8 @@ services:
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect4
       CONNECT_REST_ADVERTISED_PORT: 8083
+      KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
+      KAFKA_JVM_PERFORMANCE_OPTS: >
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=100
+    mem_limit: 2g
