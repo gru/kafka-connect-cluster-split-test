@@ -57,6 +57,7 @@ services:
   # =========================================================
   kafka1:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka1
     platform: linux/amd64
     hostname: kafka1
     networks: [dc1, zk]
@@ -73,6 +74,7 @@ services:
 
   kafka2:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka2
     platform: linux/amd64
     hostname: kafka2
     networks: [dc1, zk]
@@ -89,6 +91,7 @@ services:
 
   kafka3:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka3
     platform: linux/amd64
     hostname: kafka3
     networks: [dc1, zk]
@@ -105,6 +108,7 @@ services:
 
   kafka4:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka4
     platform: linux/amd64
     hostname: kafka4
     networks: [dc1, zk]
@@ -124,6 +128,7 @@ services:
   # =========================================================
   kafka5:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka5
     platform: linux/amd64
     hostname: kafka5
     networks: [dc2, zk]
@@ -140,6 +145,7 @@ services:
 
   kafka6:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka6
     platform: linux/amd64
     hostname: kafka6
     networks: [dc2, zk]
@@ -156,6 +162,7 @@ services:
 
   kafka7:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka7
     platform: linux/amd64
     hostname: kafka7
     networks: [dc2, zk]
@@ -172,6 +179,7 @@ services:
 
   kafka8:
     image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka8
     platform: linux/amd64
     hostname: kafka8
     networks: [dc2, zk]
@@ -214,6 +222,7 @@ services:
   # =========================================================
   connect1:
     image: debezium/connect:1.9
+    container_name: connect1
     platform: linux/amd64
     hostname: connect1
     profiles: ["connect"]
@@ -244,6 +253,7 @@ services:
 
   connect2:
     image: debezium/connect:1.9
+    container_name: connect2
     platform: linux/amd64
     hostname: connect2
     profiles: ["connect"]
@@ -272,6 +282,7 @@ services:
 
   connect3:
     image: debezium/connect:1.9
+    container_name: connect3
     platform: linux/amd64
     hostname: connect3
     profiles: ["connect"]
@@ -302,6 +313,7 @@ services:
 
   connect4:
     image: debezium/connect:1.9
+    container_name: connect4
     platform: linux/amd64
     hostname: connect4
     profiles: ["connect"]

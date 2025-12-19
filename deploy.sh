@@ -23,7 +23,8 @@ for f in ./connectors/pg-src-tbl*.json; do
     --topic "$TOPIC" \
     --partitions 3 \
     --replication-factor 3 \
-    --config min.insync.replicas=2
+    --config min.insync.replicas=2 \
+    --config cleanup.policy=compact
 done
 
 echo
