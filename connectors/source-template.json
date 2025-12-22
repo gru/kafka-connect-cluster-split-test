@@ -18,7 +18,7 @@
     "slot.name": "debezium_src_{{TABLE}}",
     "publication.autocreate.mode": "all_tables",
 
-    "snapshot.mode": "initial",
+    "snapshot.mode": "none",
 
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",

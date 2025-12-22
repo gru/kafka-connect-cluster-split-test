@@ -1,31 +1,8 @@
 docker compose up -d
 
-docker exec kafka1 kafka-topics \
-  --bootstrap-server kafka1:9092 \
-  --create \
-  --topic connect-configs \
-  --replication-factor 3 \
-  --partitions 1 \
-  --config min.insync.replicas=2 \
-  --config cleanup.policy=compact
-
-docker exec kafka1 kafka-topics \
-  --bootstrap-server kafka1:9092 \
-  --create \
-  --topic connect-offsets \
-  --replication-factor 3 \
-  --partitions 25 \
-  --config min.insync.replicas=2 \
-  --config cleanup.policy=compact
-
-docker exec kafka1 kafka-topics \
-  --bootstrap-server kafka1:9092 \
-  --create \
-  --topic connect-status \
-  --replication-factor 3 \
-  --partitions 5 \
-  --config min.insync.replicas=2 \
-  --config cleanup.policy=compact
+CONNECT_REPLICATION_FACTOR=3 \
+CONNECT_MIN_INSYNC_REPLICAS=2 \
+./create-connect-topics.sh
 
 docker buildx build \
   --platform linux/amd64 \
@@ -39,6 +16,9 @@ docker compose --profile connect up -d
 
 ./generate-connectors.sh
 
+PARTITIONS=3 \
+REPLICATION_FACTOR=3 \
+MIN_INSYNC_REPLICAS=2 \
 ./deploy-connectors.sh
 
 ./connect-status-table.sh
