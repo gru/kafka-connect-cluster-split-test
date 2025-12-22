@@ -1,30 +1,15 @@
 networks:
-  dc1:
-  dc2:
-  zk:
+  kfk:
 
 services:
   # =========================================================
-  # Router (единственная точка связи между DC)
-  # =========================================================
-  router:
-    image: alpine
-    container_name: dc-router
-    cap_add:
-      - NET_ADMIN
-    command: sh -c "apk add --no-cache iproute2 iptables && sleep infinity"
-    networks:
-      - dc1
-      - dc2
-
-  # =========================================================
-  # ZooKeeper (3 ноды, ВСЕ в одной сети zk)
+  # ZooKeeper (3 ноды, общая сеть kfk)
   # =========================================================
   zk1:
     image: confluentinc/cp-zookeeper:6.2.0
     platform: linux/amd64
     hostname: zk1
-    networks: [zk]
+    networks: [kfk]
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -34,7 +19,7 @@ services:
     image: confluentinc/cp-zookeeper:6.2.0
     platform: linux/amd64
     hostname: zk2
-    networks: [zk]
+    networks: [kfk]
     environment:
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -44,21 +29,21 @@ services:
     image: confluentinc/cp-zookeeper:6.2.0
     platform: linux/amd64
     hostname: zk3
-    networks: [zk]
+    networks: [kfk]
     environment:
       ZOOKEEPER_SERVER_ID: 3
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVERS: zk1:2888:3888;zk2:2888:3888;zk3:2888:3888
 
   # =========================================================
-  # Kafka DC1 (4 брокера: dc1 + zk)
+  # Kafka DC1 (4 брокера)
   # =========================================================
   kafka1:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka1
     platform: linux/amd64
     hostname: kafka1
-    networks: [dc1, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 1
@@ -70,13 +55,13 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
       KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
-        
+
   kafka2:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka2
     platform: linux/amd64
     hostname: kafka2
-    networks: [dc1, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 2
@@ -88,13 +73,13 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
       KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
-        
+
   kafka3:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka3
     platform: linux/amd64
     hostname: kafka3
-    networks: [dc1, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 3
@@ -106,13 +91,13 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
       KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
-        
+
   kafka4:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka4
     platform: linux/amd64
     hostname: kafka4
-    networks: [dc1, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 4
@@ -126,14 +111,14 @@ services:
       KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
 
   # =========================================================
-  # Kafka DC2 (4 брокера: dc2 + zk)
+  # Kafka DC2 (4 брокера)
   # =========================================================
   kafka5:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka5
     platform: linux/amd64
     hostname: kafka5
-    networks: [dc2, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 5
@@ -151,7 +136,7 @@ services:
     container_name: kafka6
     platform: linux/amd64
     hostname: kafka6
-    networks: [dc2, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 6
@@ -169,7 +154,7 @@ services:
     container_name: kafka7
     platform: linux/amd64
     hostname: kafka7
-    networks: [dc2, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 7
@@ -187,7 +172,7 @@ services:
     container_name: kafka8
     platform: linux/amd64
     hostname: kafka8
-    networks: [dc2, zk]
+    networks: [kfk]
     depends_on: [zk1, zk2, zk3]
     environment:
       KAFKA_BROKER_ID: 8
@@ -208,7 +193,7 @@ services:
     platform: linux/amd64
     container_name: postgres
     hostname: postgres
-    networks: [dc1, dc2]
+    networks: [kfk]
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -224,154 +209,104 @@ services:
       - "5432:5432"
 
   # =========================================================
-  # Kafka Connect + Debezium (profile: connect)
+  # Kafka Connect + Debezium
   # =========================================================
   connect1:
     image: kafka-connect-debezium-jdbc:1.9
     container_name: connect1
     platform: linux/amd64
     hostname: connect1
-    profiles: [ "connect" ]
-    networks:
-      - dc1
-      - zk
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-      - kafka4
+    profiles: ["connect"]
+    networks: [kfk]
+    depends_on: [kafka1, kafka2, kafka3, kafka4]
     environment:
       BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
       GROUP_ID: connect-cluster
-
       CONFIG_STORAGE_TOPIC: connect-configs
       OFFSET_STORAGE_TOPIC: connect-offsets
       STATUS_STORAGE_TOPIC: connect-status
-
       KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect1
       CONNECT_REST_ADVERTISED_PORT: 8083
-      
       KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
-      KAFKA_JVM_PERFORMANCE_OPTS: >
-        -XX:+UseG1GC
-        -XX:MaxGCPauseMillis=100
     mem_limit: 2g
     ports:
       - "8083:8083"
-  
+
   connect2:
     image: kafka-connect-debezium-jdbc:1.9
     container_name: connect2
     platform: linux/amd64
     hostname: connect2
-    profiles: [ "connect" ]
-    networks:
-      - dc1
-      - zk
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-      - kafka4
+    profiles: ["connect"]
+    networks: [kfk]
+    depends_on: [kafka1, kafka2, kafka3, kafka4]
     environment:
       BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
       GROUP_ID: connect-cluster
-
       CONFIG_STORAGE_TOPIC: connect-configs
       OFFSET_STORAGE_TOPIC: connect-offsets
       STATUS_STORAGE_TOPIC: connect-status
-
       KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect2
       CONNECT_REST_ADVERTISED_PORT: 8083
-      
       KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
-      KAFKA_JVM_PERFORMANCE_OPTS: >
-        -XX:+UseG1GC
-        -XX:MaxGCPauseMillis=100
     mem_limit: 2g
-  
+
   connect3:
     image: kafka-connect-debezium-jdbc:1.9
     container_name: connect3
     platform: linux/amd64
     hostname: connect3
-    profiles: [ "connect" ]
-    networks:
-      - dc2
-      - zk
-    depends_on:
-      - kafka5
-      - kafka6
-      - kafka7
-      - kafka8
+    profiles: ["connect"]
+    networks: [kfk]
+    depends_on: [kafka5, kafka6, kafka7, kafka8]
     environment:
       BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
       GROUP_ID: connect-cluster
-
       CONFIG_STORAGE_TOPIC: connect-configs
       OFFSET_STORAGE_TOPIC: connect-offsets
       STATUS_STORAGE_TOPIC: connect-status
-
       KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect3
       CONNECT_REST_ADVERTISED_PORT: 8083
       KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
-      KAFKA_JVM_PERFORMANCE_OPTS: >
-        -XX:+UseG1GC
-        -XX:MaxGCPauseMillis=100
-    mem_limit: 2g      
+    mem_limit: 2g
     ports:
       - "8084:8083"
-  
+
   connect4:
     image: kafka-connect-debezium-jdbc:1.9
     container_name: connect4
     platform: linux/amd64
     hostname: connect4
-    profiles: [ "connect" ]
-    networks:
-      - dc2
-      - zk
-    depends_on:
-      - kafka5
-      - kafka6
-      - kafka7
-      - kafka8
+    profiles: ["connect"]
+    networks: [kfk]
+    depends_on: [kafka5, kafka6, kafka7, kafka8]
     environment:
       BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092,kafka3:9092,kafka4:9092,kafka5:9092,kafka6:9092,kafka7:9092,kafka8:9092
       GROUP_ID: connect-cluster
-
       CONFIG_STORAGE_TOPIC: connect-configs
       OFFSET_STORAGE_TOPIC: connect-offsets
       STATUS_STORAGE_TOPIC: connect-status
-
       KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-
       REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: connect4
       CONNECT_REST_ADVERTISED_PORT: 8083
       KAFKA_HEAP_OPTS: "-Xms512m -Xmx512m"
-      KAFKA_JVM_PERFORMANCE_OPTS: >
-        -XX:+UseG1GC
-        -XX:MaxGCPauseMillis=100
     mem_limit: 2g
