@@ -1,9 +1,24 @@
 #!/usr/bin/env bash
 set -e
 
+# ==========================================================
+# Defaults (can be overridden via env vars)
+# ==========================================================
+PARTITIONS="${PARTITIONS:-3}"
+REPLICATION_FACTOR="${REPLICATION_FACTOR:-3}"
+MIN_INSYNC_REPLICAS="${MIN_INSYNC_REPLICAS:-2}"
+
 KAFKA_CONTAINER="kafka1"
 BOOTSTRAP_SERVER="kafka1:9092"
 CONNECT_URL="http://localhost:8083"
+
+echo "=================================================="
+echo "Kafka topic defaults:"
+echo "  partitions               = $PARTITIONS"
+echo "  replication-factor       = $REPLICATION_FACTOR"
+echo "  min.insync.replicas      = $MIN_INSYNC_REPLICAS"
+echo "=================================================="
+echo
 
 echo "=================================================="
 echo "Step 1: Creating Kafka topics for Debezium data"
@@ -15,14 +30,14 @@ for f in ./connectors/pg-src-tbl*.json; do
 
   echo "Creating topic: $TOPIC"
 
-  docker compose exec kafka1 kafka-topics \
+  docker compose exec "$KAFKA_CONTAINER" kafka-topics \
     --bootstrap-server "$BOOTSTRAP_SERVER" \
     --create \
     --if-not-exists \
     --topic "$TOPIC" \
-    --partitions 3 \
-    --replication-factor 3 \
-    --config min.insync.replicas=2 \
+    --partitions "$PARTITIONS" \
+    --replication-factor "$REPLICATION_FACTOR" \
+    --config "min.insync.replicas=$MIN_INSYNC_REPLICAS" \
     --config cleanup.policy=compact
 done
 
