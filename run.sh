@@ -40,3 +40,11 @@ docker compose --profile connect up -d
 ./generate-connectors.sh
 
 ./deploy-connectors.sh
+
+./connect-status-table.sh
+
+./fill-src-data.sh
+
+./check-dst-counts.sh
+
+./stop-dc2-services.sh
