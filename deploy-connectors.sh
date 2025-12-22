@@ -30,7 +30,7 @@ for f in ./connectors/pg-src-tbl*.json; do
 
   echo "Creating topic: $TOPIC"
 
-  docker compose --env-file .env.rf3misr2 exec "$KAFKA_CONTAINER" kafka-topics \
+  docker compose exec "$KAFKA_CONTAINER" kafka-topics \
     --bootstrap-server "$BOOTSTRAP_SERVER" \
     --create \
     --if-not-exists \

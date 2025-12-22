@@ -1,7 +1,7 @@
-docker compose --env-file .env.rf3misr2 up -d
+source .env.r4misr2
 
-CONNECT_REPLICATION_FACTOR=3 \
-CONNECT_MIN_INSYNC_REPLICAS=2 \
+docker compose up -d
+
 ./create-connect-topics.sh
 
 docker buildx build \
@@ -10,14 +10,12 @@ docker buildx build \
   --load \
   ./connect
 
-docker compose --profile connect --env-file .env.rf3misr2 up -d
+docker compose --profile connect up -d
 
 ./wait-connect-ready.sh
 
 ./generate-connectors.sh
 
-REPLICATION_FACTOR=3 \
-MIN_INSYNC_REPLICAS=2 \
 ./deploy-connectors.sh
 
 ./connect-status-table.sh
@@ -27,5 +25,7 @@ MIN_INSYNC_REPLICAS=2 \
 ./check-dst-counts.sh
 
 ./stop-dc2-services.sh
+
+./fill-src-data.sh
 
 ./start-dc2-services.sh
