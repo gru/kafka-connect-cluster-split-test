@@ -2,7 +2,7 @@
 set -e
 
 echo ">>> Stopping and removing containers, networks, volumes..."
-docker compose --profile connect down -v --remove-orphans
+docker compose --profile connect --env-file .env.rf3misr2 down -v --remove-orphans
 
 echo ">>> Removing dangling volumes (if any)..."
 docker volume prune -f

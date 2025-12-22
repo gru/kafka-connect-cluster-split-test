@@ -12,7 +12,7 @@ echo "=================================================="
 for i in $(seq 1 10); do
   TABLE="tbl${i}"
 
-  COUNT=$(docker compose exec -T "$POSTGRES_SERVICE" psql \
+  COUNT=$(docker compose --env-file .env.rf3misr2 exec -T "$POSTGRES_SERVICE" psql \
     -U "$USER" \
     -d "$DB" \
     -t -c "SELECT COUNT(*) FROM ${TABLE};" \

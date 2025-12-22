@@ -16,7 +16,7 @@ for i in $(seq 1 10); do
 
   echo "Inserting data into ${DB}.${TABLE}"
 
-  docker compose exec -T "$POSTGRES_SERVICE" psql \
+  docker compose  --env-file .env.rf3misr2 exec -T "$POSTGRES_SERVICE" psql \
     -U "$USER" \
     -d "$DB" \
     <<EOF
