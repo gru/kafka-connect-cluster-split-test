@@ -1,14 +1,8 @@
-source .env.r4misr2
+source .env.rf4misr2
 
 docker compose up -d
 
 ./create-connect-topics.sh
-
-docker buildx build \
-  --platform linux/amd64 \
-  -t kafka-connect-debezium-jdbc:1.9 \
-  --load \
-  ./connect
 
 docker compose --profile connect up -d
 
