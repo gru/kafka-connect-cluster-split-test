@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-CONNECT_URL="http://localhost:8084"
+CONNECT_URL="http://localhost:8083"
 
 printf "\n%-30s | %-15s | %-20s | %-35s\n" \
   "CONNECTOR NAME" "STATE" "CONNECTOR NODE" "TASKS (STATE@NODE)"
